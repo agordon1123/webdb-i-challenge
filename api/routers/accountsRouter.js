@@ -9,4 +9,11 @@ router.get('/', (req, res) => {
         .catch(err => res.status(500).json(err))
 });
 
+router.get('/:id', (req, res) => {
+    const { id } = req.params;
+    db('accounts').where({ id })
+        .then(account => res.status(200).json(account))
+        .catch(err => res.status(500).json(err))
+});
+
 module.exports = router;
