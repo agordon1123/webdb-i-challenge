@@ -13,9 +13,24 @@ router.post('/', validateAccountBody, (req, res) => {
 
 // READ
 router.get('/', (req, res) => {
-    db('accounts')
-        .then(accounts => res.status(200).json(accounts))
-        .catch(err => res.status(500).json(err))
+    const { limit, sortby, sortdir } = req.query;
+    if (limit) {
+        db('accounts').limit(limit)
+            .then(accounts => res.status(200).json(accounts))
+            .catch(err => res.status(500).json(err))
+    } else if (sortby) {
+        db('accounts').orderBy(sortby)
+            .then(accounts => res.status(200).json(accounts))
+            .catch(err => res.status(500).json(err))
+    } else if (sortdir) {
+        db('accounts').groupBy(sortdir)
+            .then(accounts => res.status(200).json(accounts))
+            .catch(err => res.status(500).json(err))
+    } else {
+        db('accounts')
+            .then(accounts => res.status(200).json(accounts))
+            .catch(err => res.status(500).json(err))
+    }
 });
 
 router.get('/:id', (req, res) => {
@@ -29,7 +44,6 @@ router.get('/:id', (req, res) => {
 router.put('/:id', validateAccountBody, (req, res) => {
     const { id } = req.params;
     const changes = req.body;
-    changes.budget = parseInt(req.body.budget);
 
     db('accounts').where({ id })
         .update(changes)
